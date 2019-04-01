@@ -49,88 +49,139 @@
 
 */
 
-
-// 4. Return to the pc_cword.js file in your editor. Below the initial comment section, declare the fol- lowing global variables:
-// a. allLetters, which will be used to reference all letters in the crossword puzzle 
-// b. currentLetter, which will be used to reference the letter currently selected in the puzzle 
-// c. wordLetters, which will be used to reference the letters used in the currently selected across and down clues 
-// d. acrossclue, which will be used to reference the across clue currently selected in the puzzle e. downclue, which will be used to reference the down clue currently selected in the puzzle
-// f. typeDirection, which stores the current typing direction (either to the right or down); set its initial value to “right” 
 var allLetters;
 var currentLetter;
 var wordLetters;
 var acrossClue;
+var downClue;
 var typeDirection = "right";
 
-// 5. Add a command to run the init() function when the page loads.
 window.onload = init;
 
-// 6. Create the init() function, which sets up the initial conditions of the puzzle. Add the following commands to the function:
-// a. Set allLetters to reference the elements using the selector table#crossword span. 
-// b.Set currentLetter to reference the first object in allLetters collection
-// c.Declare the acrossiD variable, setting its value equal to the value of the data - clue - a attribute
-// for currentLetter.Declare the downiD variable, setting its value equal to the value of the data - clue - d attribute
-// for currentLetter.
-// d. Set the value of acrossClue to reference the element with the id attribute “acrossID”. 
-// Set the value of downClue to reference the element with the id attribute “downID”.
-
 function init() {
-      allLetters = document.querySelectorAll("table#crossword span");
-      currentLetter = allLetters[0];
-      var acrossID = currentLetter.dataset.clueA;
-      var downID = currentLetter.dataset.clueD;
-      acrossClue = document.getElementById(currentLetter.dataset.clueA);
-      downClue = document.getElementById(currentLetter.dataset.clueD);
+   allLetters = document.querySelectorAll("table#crossword span");
+   currentLetter = allLetters[0];
+   var acrossID = currentLetter.dataset.clueA;
+   var downID = currentLetter.dataset.clueD;
+   acrossClue = document.getElementById(currentLetter.dataset.clueA);
+   downClue = document.getElementById(currentLetter.dataset.clueD);
+
+   formatPuzzle(currentLetter);
+
+   for (var i = 0; i < allLetters.length; i++) {
+      allLetters[i].style.cursor = "pointer";
+      allLetters[i].onmousedown = function (e) {
+            formatPuzzle(e.target);
+      };
 }
 
-// 7. Next, create the formatPuzzle() function. This function will format the colors of the crossword table cells and the clues in the clues list based on the letter that is selected by user. The function has a single parameter named puzzleLetter. Add the following commands to the function: 
-// a. Change the value of currentLetter to puzzleLetter.
-// b. Remove the current colors in the puzzle by looping through all items in the allLetters object collection, changing the background-color style of each to an empty text string.
-// c. After the for loop, remove the highlighting of the current clues by changing the color style of acrossClue and downClue to an empty text string.
+document.onkeydown = selectLetter;
+
+var typeImage = document.getElementById("directionImg");
+typeImage.style.cursor = "pointer";
+
+typeImage.onclick = switchTypeDirection;
+
+document.getElementById("showErrors").onclick = function () {
+   for (var i = 0; i < allLetters.length; i++) {
+         if (allLetters[i].textContent !== allLetters[i].dataset.letter) {
+               allLetters[i].style.color = "red";
+               setTimeout(function () {
+                     for (var i = 0; i < allLetters.length; i++) {
+                           allLetters[i].style.color = "";
+                     }
+               }, 3000);
+         }
+   }
+}
+
+document.getElementById("showSolution").onclick = function () {
+   for (var i = 0; i < allLetters.length; i++) {
+         allLetters[i].textContent = allLetters[i].dataset.letter;
+   }
+};
+}
 
 function formatPuzzle(puzzleLetter) {
-      currentLetter = puzzleLetter;
-      for (var i = 0; i < allLetters.length; i++) {
-            allLetters[i].style.backgroundcolor = "";
-      }
-      acrossClue.style.color = "";
-      downClue.style.color = "";
+   currentLetter = puzzleLetter;
+   for (var i = 0; i < allLetters.length; i++) {
+         allLetters[i].style.backgroundColor = "";
+   }
 
-      // d.	Determine whether there exists an across clue for the current letter by testing whether currentLetter.dataset.clueA is not equal to undefined. If true, then do the following: 
-      // i.	Set acrossClue to reference the element with the ID value of currentLetter.dataset. clueA in order to reference the across clue for the current letter.
-      // ii.	Change the color style of acrossClue to blue. 
-      // iii. Set wordLetters to reference all elements selected by the CSS selector [data-clue-A =clue] where clue is the value of data-clue-a for currentLetter. 
-      // iv.	Change the background-color style of every item in wordLetters to the light blue color
-      // value rgb(231, 231, 255).
+   acrossClue.style.color = "";
+   downClue.style.color = "";
 
       if (currentLetter.dataset.clueA !== undefined) {
-            acrossClue = document.getElementById(currentLetter.dataset.clueA);
-            acrossClue.style.color = "blue";
-            wordLetters = document.querySelectorAll("[data-clue-a =" + currentLetter.dataset.clueA + "]");
+         acrossClue = document.getElementById(currentLetter.dataset.clueA);
+         acrossClue.style.color = "blue";
+         wordLetters = document.querySelectorAll("[data-clue-a = " + currentLetter.dataset.clueA + "]");
 
-            for (var i = 0; i < wordLetters.length; i++) {
-                  wordLetters[i].style.backgroundcolor = "rgb(231, 231, 255)";
-            }
-      }
+         for (var i = 0; i < wordLetters.length; i++) {
+               wordLetters[i].style.backgroundColor = "rgb(231, 231, 255)";
+         }
+   }
 
-      // e. Repeat Step d for the down clue indicated by the data-clue-d attribute, changing the color style of downClue to red and the background-color style of the items in wordLetters to the light red color value rgb(255, 231, 231).
+   if (currentLetter.dataset.clueD !== undefined) {
+         downClue = document.getElementById(currentLetter.dataset.clueD);
+         downClue.style.color = "red";
+         wordLetters = document.querySelectorAll("[data-clue-d = " + currentLetter.dataset.clueD + "]");
+         for (var i = 0; i < wordLetters.length; i++) {
+               wordLetters[i].style.backgroundColor = "rgb(255, 231, 231)";
+         }
+   }
 
-      if (currentLetter.dataset.clueD !== undefined) {
-            downClue = document.getElementById(currentLetter.dataset.clueD);
-            downClue.style.color = "red";
-            wordLetters = document.querySelectorAll("[data-clue-d =" + currentLetter.dataset.clueD + "]");
-            for (var i = 0; i < wordLetters.length; i++) {
-                  wordLetters[i].style.backgroundcolor = "rgb(255, 231, 231)";
-            }
-      }
 
-      // f.	Indicate the typing direction for the current letter. If typeDirection = “right”, change the background color of currentLetter to the blue color value rgb(191, 191, 255); otherwise, change the background color to the red color value rgb(255, 191, 191).
+   if (typeDirection === "right") {
+         currentLetter.style.backgroundColor = "rgb(191, 191, 255)";
+   } else {
+         currentLetter.style.backgroundColor = "rgb(255, 191, 191)";
+   }
 
-      if (typeDirection = "right") {
-            currentLetter[i].style.color = "rgb(191, 191, 255)";
+}
+
+function selectLetter(e) {
+   var leftLetter = document.getElementById(currentLetter.dataset.left);
+   var upLetter = document.getElementById(currentLetter.dataset.up);
+   var rightLetter = document.getElementById(currentLetter.dataset.right);
+   var downLetter = document.getElementById(currentLetter.dataset.down);
+
+   var userKey = e.keyCode;
+
+
+   if (userKey === 37) {
+      formatPuzzle(leftLetter);
+} else if (userKey === 38) {
+      formatPuzzle(upLetter);
+} else if (userKey === 39 || userKey === 9) {
+      formatPuzzle(rightLetter);
+} else if (userKey === 40 || userKey === 13) {
+      formatPuzzle(downLetter);
+} else if (userKey === 8 || userKey === 46) {
+      currentLetter.textContent = "";
+} else if (userKey === 32) {
+      switchTypeDirection();
+} else if (userKey >= 65 && userKey <= 90) {
+      currentLetter.textContent = getChar(userKey);
+      if (typeDirection === "right") {
+            formatPuzzle(rightLetter);
       } else {
-            currentLetter[i].style.color = "rgb(255, 191, 191)";
+            formatPuzzle(downLetter);
       }
+}
+e.preventDefault();
+}
+
+function switchTypeDirection() {
+   var typeImage = document.getElementById("directionImg");
+   if (typeDirection === "right") {
+         typeDirection = "down";
+         typeImage.src = "pc_down.png";
+         currentLetter.style.backgroundColor = "rgb(255, 191, 191)";
+   } else {
+         typeDirection = "right";
+         typeImage.src = "pc_right.png";
+         currentLetter.style.backgroundColor = "rgb(191, 191, 255)";
+   }
 }
 
 /*====================================================*/
